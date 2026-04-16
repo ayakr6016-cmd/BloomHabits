@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Habit</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="{{ theme }}">
+
+<div class="container">
+    <div class="card">
+        <h2>Edit Habit ✏️</h2>
+
+        <form method="POST">
+            <div class="form-group">
+                <input type="text" name="title" value="{{ habit['title'] }}" required>
+            </div>
+
+            <div class="form-group">
+                <input type="text" name="description" value="{{ habit['description'] }}">
+            </div>
+
+            <button type="submit">Save Changes</button>
+        </form>
+
+        <br>
+        <a class="logout-link" href="/dashboard">Back to Dashboard</a>
+    </div>
+</div>
+
+</body>
+</html>

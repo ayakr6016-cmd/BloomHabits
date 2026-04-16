@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body class="{{ theme }}">
+
+<div class="container">
+
+    <div class="card top-card">
+        <h1>Healthy Habits ✨</h1>
+        <p class="subtitle">Welcome back, {{ username }} 💗</p>
+        <p class="daily-message">{{ daily_message }}</p>
+
+        <div class="theme-buttons">
+            <a class="theme-btn pink-btn" href="/set_theme/pink">Pink</a>
+            <a class="theme-btn grey-btn" href="/set_theme/grey">Grey</a>
+            <a class="theme-btn dark-btn" href="/set_theme/dark">Dark</a>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Tools 🔥</h2>
+        <a href="/calculator" class="theme-btn pink-btn">
+            <i class="fa-solid fa-fire"></i> Calorie Calculator
+        </a>
+    </div>
+
+    <div class="card">
+        <h2>Today's Progress</h2>
+        <p>{{ completed_count }} / {{ total_habits }} habits done</p>
+
+        <div class="progress-bar">
+            <div class="progress-fill" style="width: {{ progress_percent }}%;"></div>
+        </div>
+
+        <p class="progress-text">{{ progress_percent }}%</p>
+    </div>
+
+    <div class="card">
+        <h2>Water Tracker 💧</h2>
+        <p>{{ water_cups }} / {{ water_goal }} cups today</p>
+
+        <div class="progress-bar water-bar">
+            <div class="progress-fill water-fill" style="width: {{ water_percent }}%;"></div>
+        </div>
+
+        <div class="actions water-actions">
+            <a href="/add_water" class="action-link complete-link">
+                <i class="fa-solid fa-plus"></i> Add Cup
+            </a>
+            <a href="/remove_water" class="action-link delete-link">
+                <i class="fa-solid fa-minus"></i> Remove
+            </a>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Achievements 🏆</h2>
+        <p class="achievement-badge">{{ achievement }}</p>
+        <p>Best streak: <b>{{ best_streak }}</b> days</p>
+    </div>
+
+    <div class="card">
+        <h2>Add Habit</h2>
+        <form method="POST">
+            <input type="text" name="title" placeholder="Habit name..." required><br><br>
+            <input type="text" name="description" placeholder="Description..."><br><br>
+
+            <button type="submit">
+                <i class="fa-solid fa-plus"></i> Add
+            </button>
+        </form>
+    </div>
+
+    <div class="card">
+        <h2>Your Habits</h2>
+
+        {% if habits %}
+            <ul>
+                {% for habit in habits %}
+                    <li>
+                        <div class="habit-top">
+                            <div class="habit-title-wrap">
+                                {% if "water" in habit.title.lower() %}
+                                    <i class="fa-solid fa-droplet habit-icon"></i>
+                                {% elif "gym" in habit.title.lower() or "workout" in habit.title.lower() or "exercise" in habit.title.lower() %}
+                                    <i class="fa-solid fa-dumbbell habit-icon"></i>
+                                {% elif "sleep" in habit.title.lower() %}
+                                    <i class="fa-solid fa-bed habit-icon"></i>
+                                {% elif "read" in habit.title.lower() or "book" in habit.title.lower() %}
+                                    <i class="fa-solid fa-book habit-icon"></i>
+                                {% elif "food" in habit.title.lower() or "eat" in habit.title.lower() %}
+                                    <i class="fa-solid fa-bowl-food habit-icon"></i>
+                                {% elif "study" in habit.title.lower() %}
+                                    <i class="fa-solid fa-graduation-cap habit-icon"></i>
+                                {% elif "walk" in habit.title.lower() %}
+                                    <i class="fa-solid fa-shoe-prints habit-icon"></i>
+                                {% else %}
+                                    <i class="fa-solid fa-heart habit-icon"></i>
+                                {% endif %}
+
+                                <div class="habit-title">{{ habit.title }}</div>
+                            </div>
+
+                            {% if habit.completed_today %}
+                                <span class="status done">
+                                    <i class="fa-solid fa-check"></i> Done
+                                </span>
+                            {% else %}
+                                <span class="status not-done">
+                                    <i class="fa-solid fa-xmark"></i> Not done
+                                </span>
+                            {% endif %}
+                        </div>
+
+                        <div class="habit-desc">{{ habit.description }}</div>
+
+                        <div class="habit-extra">
+                            <span class="streak-badge">
+                                <i class="fa-solid fa-fire"></i> {{ habit.streak }} days
+                            </span>
+                        </div>
+
+                        <div class="actions">
+                            <a href="/toggle_habit/{{ habit.id }}" class="action-link complete-link">
+                                <i class="fa-solid fa-check"></i>
+                            </a>
+
+                            <a href="/edit_habit/{{ habit.id }}" class="action-link edit-link">
+                                <i class="fa-solid fa-pen"></i>
+                            </a>
+
+                            <a href="/delete_habit/{{ habit.id }}" class="action-link delete-link">
+                                <i class="fa-solid fa-trash"></i>
+                            </a>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="empty-text">No habits yet 🌸</p>
+        {% endif %}
+    </div>
+
+    <div class="card">
+        <h2>{{ month_name }} {{ year }}</h2>
+
+        <div class="calendar-grid header-row">
+            <div>Mon</div>
+            <div>Tue</div>
+            <div>Wed</div>
+            <div>Thu</div>
+            <div>Fri</div>
+            <div>Sat</div>
+            <div>Sun</div>
+        </div>
+
+        {% for week in calendar_data %}
+            <div class="calendar-grid">
+                {% for day in week %}
+                    {% if day == 0 %}
+                        <div class="calendar-day empty-day"></div>
+                    {% elif day in completed_days %}
+                        <div class="calendar-day completed-day">{{ day }}</div>
+                    {% else %}
+                        <div class="calendar-day">{{ day }}</div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% endfor %}
+    </div>
+
+    <a href="/logout" class="logout-link">
+        <i class="fa-solid fa-right-from-bracket"></i> Logout
+    </a>
+
+</div>
+
+</body>
+</html>
